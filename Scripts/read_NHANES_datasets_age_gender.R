@@ -70,3 +70,25 @@ head(final_data)
 
 # Save the final dataset (optional)
 write_csv(final_data, file.path(data_dir, "NHANES_1999_2004_combined.csv"))
+
+
+
+
+###########Some checks######################
+
+# Check gender distribution in demo_data
+table(demo_data$RIAGENDR)
+
+# Check gender distribution in the other datasets
+table(RHQ_data$RIAGENDR)
+table(GAD_data$RIAGENDR)
+table(Depression_data$RIAGENDR)
+
+# Check gender distribution in final_data
+table(final_data$RIAGENDR)
+
+min_age <- min(final_data$RIDAGEYR, na.rm = TRUE)
+max_age <- max(final_data$RIDAGEYR, na.rm = TRUE)
+
+cat("Minimum age:", min_age, "\n")
+cat("Maximum age:", max_age, "\n")
