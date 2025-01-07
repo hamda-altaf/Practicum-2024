@@ -43,3 +43,7 @@ library(summarytools)
 # Descriptive summary for specific variables (e.g., RIDAGEYR, CIDDSCOR, CIDGSCOR)
 dfSummary(final_data[, c("RIDAGEYR", "CIDDSCOR", "CIDGSCOR")])
 
+# Cross-tabulation
+table(final_data$RIAGENDR, final_data$age_group, final_data$CIDDSCOR)
+
+
