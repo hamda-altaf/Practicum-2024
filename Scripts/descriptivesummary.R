@@ -132,13 +132,12 @@ print(continuous_summary)
 
 # Create bar plots for GAD, DD, and endometriosis prevalence
 # Adjust each plot's theme for better spacing and readability
-# Adjust each plot's theme for even smaller titles and fix overlapping x-axis labels
 gad_plot <- female_data %>%
   count(GAD_status) %>%
   ggplot(aes(x = GAD_status, y = n, fill = GAD_status)) +
   geom_bar(stat = "identity", color = "black") +
   labs(
-    title = "Prevalence of Generalized Anxiety Disorder (GAD)",
+    title = "Prevalence of GAD",
     x = "GAD Status",
     y = "Count"
   ) +
@@ -155,7 +154,7 @@ dd_plot <- female_data %>%
   ggplot(aes(x = DD_status, y = n, fill = DD_status)) +
   geom_bar(stat = "identity", color = "black") +
   labs(
-    title = "Prevalence of Depressive Disorder (DD)",
+    title = "Prevalence of DD",
     x = "DD Status",
     y = "Count"
   ) +
@@ -173,7 +172,7 @@ endo_plot <- female_data %>%
   ggplot(aes(x = Endometriosis_status, y = n, fill = Endometriosis_status)) +
   geom_bar(stat = "identity", color = "black") +
   labs(
-    title = "Prevalence of Self-Reported Endometriosis",
+    title = "Prevalence of Endometriosis",
     x = "Endometriosis Status",
     y = "Count"
   ) +
@@ -195,7 +194,7 @@ age_plot <- female_data %>%
   ) +
   theme_minimal(base_size = 11) +
   theme(
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 8) # Even smaller title
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 7) # Even smaller title
   )
 
 # Combine the plots using patchwork
@@ -224,7 +223,7 @@ print(combined_plot)
 
 ###
 
-#prevalence of endometriosis based on GAD or DD status
+#prevalence of endometriosis based on GAD status
 final_data %>%
   group_by(CIDGSCOR) %>%
   summarise(
@@ -233,6 +232,19 @@ final_data %>%
     Total = n(),
     Prevalence = Endometriosis_Yes / Total * 100
   )
+
+#prevalence of endometriosis based on DD status
+final_data %>%
+  group_by(CIDDSCOR) %>%
+  summarise(
+    Endometriosis_Yes = sum(RHQ360 == 1, na.rm = TRUE),
+    Endometriosis_No = sum(RHQ360 == 2, na.rm = TRUE),
+    Total = n(),
+    Prevalence = Endometriosis_Yes / Total * 100
+  )
+#prevalence (percentage of individuals with endometriosis out of the total number of 
+#individuals in each DD status group) of endometriosis is slightly higher in individuals 
+#with a positive depressive disorder diagnosis (7.53%) compared to those with a negative depressive disorder diagnosis (5.08%)
 
 ###
 
@@ -282,13 +294,15 @@ ggplot(final_data, aes(x = as.factor(CIDDSCOR), fill = as.factor(RHQ360))) +
 
 ###
 
-#Chi-square test for independence
+#Chi-square test for independence between GAD and Endometriosis 
 chisq.test(table(final_data$CIDGSCOR, final_data$RHQ360))
+#small chi-square ts, large p-value: there is no statistically significant relationship between GAD diagnosis and self-reported endometriosis status
 
 ###
 
-#T-test to compare age across groups (e.g., GAD positive vs. negative)
+#T-test to compare the age distribution between two groups based on Generalized Anxiety Disorder (GAD) status
 t.test(RIDAGEYR ~ CIDGSCOR, data = final_data)
+#indicates that there is a statistically significant difference in the mean age between the two groups, GAD positive vs. GAD negative
 
 ###
 #Compare the odds of self-reported endometriosis in women with GAD or DD versus those without
@@ -341,7 +355,8 @@ print(odds_ratio) #calculated odds ratio is very small, which suggests that the 
 
 
 ###
-#Summarize the data by multiple groupings (e.g., by age group and GAD status)
+
+#summary table showing the prevalence of endometriosis within different age groups and GAD statuses
 final_data %>%
   group_by(CIDGSCOR, age_group = cut(RIDAGEYR, breaks = c(20, 30, 40), labels = c("20-29", "30-39"))) %>%
   summarise(
@@ -349,6 +364,8 @@ final_data %>%
     Total = n(),
     Prevalence = Endometriosis_Yes / Total * 100
   )
-
-
+#Prevalence in age group 20-29: GAD-positive individuals (CIDGSCOR = 1) show a 0% prevalence of endometriosis (no cases).
+#GAD-negative individuals (CIDGSCOR = 5) show a 3.4% prevalence of endometriosis.
+#Prevalence in age group 30-39: GAD-positive individuals (CIDGSCOR = 1) have a 12.5% prevalence of endometriosis.
+#GAD-negative individuals (CIDGSCOR = 5) have an 8.15% prevalence of endometriosis.
 
