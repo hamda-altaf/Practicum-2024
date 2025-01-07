@@ -214,3 +214,289 @@ females_20_39_in_GAD_answered <- GAD_data %>%
 # Step 3: Check how many people answered the CIDGSCOR question
 answered_GAD <- nrow(females_20_39_in_GAD_answered)
 cat("Females 20-39 in GAD dataset who answered CIDGSCOR:", answered_GAD, "\n")
+
+########additional########
+# Step 1: Filter for females aged 20-54 in the RHQ merged dataset
+females_20_54_in_RHQ <- demo_data_combined %>%
+  filter(RIAGENDR == 2, RIDAGEYR >= 20, RIDAGEYR <= 54) %>%
+  inner_join(RHQ_data_combined, by = "SEQN")
+
+# Step 2: Count responses for the RHQ360 variable
+RHQ360_summary <- females_20_54_in_RHQ %>%
+  mutate(RHQ360_category = case_when(
+    RHQ360 == 1 ~ "Yes",
+    RHQ360 == 2 ~ "No",
+    RHQ360 == 7 ~ "Refused",
+    RHQ360 == 9 ~ "Don't know",
+    is.na(RHQ360) ~ "Missing"
+  )) %>%
+  group_by(RHQ360_category) %>%
+  summarise(count = n(), .groups = "drop")
+
+# Step 3: Print the summary
+cat("Summary of responses to RHQ360 among females aged 20-54:\n")
+print(RHQ360_summary)
+
+# Step 1: Filter for females aged 20-54 in the RHQ merged dataset
+females_20_54_in_RHQ <- demo_data_combined %>%
+  filter(RIAGENDR == 2, RIDAGEYR >= 20, RIDAGEYR <= 54) %>%
+  inner_join(RHQ_data_combined, by = "SEQN")
+
+# Step 2: Count the number of females aged 20-54 in the RHQ dataset
+total_females_20_54_in_RHQ <- nrow(females_20_54_in_RHQ)
+
+# Step 3: Print the result
+cat("Total number of females aged 20-54 in the RHQ merged dataset:", total_females_20_54_in_RHQ, "\n")
+
+# Step 1: Total number of females aged 20-54 in demo_data_combined
+females_20_54_in_demo <- demo_data_combined %>%
+  filter(RIAGENDR == 2, RIDAGEYR >= 20, RIDAGEYR <= 54)
+
+total_females_20_54_in_demo <- nrow(females_20_54_in_demo)
+cat("Total number of females aged 20-54 in demo_data_combined:", total_females_20_54_in_demo, "\n")
+
+# Step 2: Number of females aged 20-54 in demo_data_combined who are in RHQ_data_combined
+females_20_54_in_demo_in_RHQ <- females_20_54_in_demo %>%
+  filter(SEQN %in% RHQ_data_combined$SEQN)
+
+total_females_20_54_in_RHQ <- nrow(females_20_54_in_demo_in_RHQ)
+cat("Number of females aged 20-54 in demo_data_combined who are in RHQ merged dataset:", total_females_20_54_in_RHQ, "\n")
+
+# Step 3: Number of females aged 20-54 in demo_data_combined who are NOT in RHQ_data_combined
+females_20_54_in_demo_not_in_RHQ <- females_20_54_in_demo %>%
+  filter(!(SEQN %in% RHQ_data_combined$SEQN))
+
+total_females_20_54_not_in_RHQ <- nrow(females_20_54_in_demo_not_in_RHQ)
+cat("Number of females aged 20-54 in demo_data_combined who are NOT in RHQ merged dataset:", total_females_20_54_not_in_RHQ, "\n")
+
+###
+
+# Step 1: Filter females aged 20-54 in RHQ merged dataset
+females_20_54_in_RHQ <- demo_data_combined %>%
+  filter(RIAGENDR == 2, RIDAGEYR >= 20, RIDAGEYR <= 54, SEQN %in% RHQ_data_combined$SEQN)
+
+# Step 2: Merge demographic and RHQ data for females 20-54
+females_20_54_with_RHQ360 <- females_20_54_in_RHQ %>%
+  inner_join(RHQ_data_combined, by = "SEQN")
+
+# Step 3: How many answered and did not answer RHQ360
+answered_RHQ360 <- females_20_54_with_RHQ360 %>%
+  filter(!is.na(RHQ360))
+
+not_answered_RHQ360 <- females_20_54_with_RHQ360 %>%
+  filter(is.na(RHQ360))
+
+cat("Females aged 20-54 who answered RHQ360:", nrow(answered_RHQ360), "\n")
+cat("Females aged 20-54 who did NOT answer RHQ360:", nrow(not_answered_RHQ360), "\n")
+
+# Step 4: Of those who answered RHQ360, breakdown by response
+response_breakdown <- answered_RHQ360 %>%
+  group_by(RHQ360) %>%
+  summarise(Count = n()) %>%
+  mutate(Response = case_when(
+    RHQ360 == 1 ~ "Yes",
+    RHQ360 == 2 ~ "No",
+    RHQ360 == 7 ~ "Refused",
+    RHQ360 == 9 ~ "Don't know",
+    is.na(RHQ360) ~ "Missing"
+  ))
+
+cat("\nBreakdown of responses to RHQ360:\n")
+print(response_breakdown)
+
+# Step 5: Add summary of missing responses
+missing_count <- nrow(not_answered_RHQ360)
+cat("\nMissing responses to RHQ360:", missing_count, "\n")
+
+###
+
+# Step 1: Filter females aged 20-54 in RHQ merged dataset who answered RHQ360
+females_20_54_answered_RHQ360 <- females_20_54_with_RHQ360 %>%
+  filter(!is.na(RHQ360))
+
+# Step 2: Split into age groups (20-39 and >39 to 54)
+females_20_39 <- females_20_54_answered_RHQ360 %>%
+  filter(RIDAGEYR >= 20, RIDAGEYR <= 39)
+
+females_40_54 <- females_20_54_answered_RHQ360 %>%
+  filter(RIDAGEYR > 39, RIDAGEYR <= 54)
+
+# Step 3: Count the number of females in each age group
+cat("Females aged 20-39 who answered RHQ360:", nrow(females_20_39), "\n")
+cat("Females aged 40-54 who answered RHQ360:", nrow(females_40_54), "\n")
+
+#######
+
+# Step 1: Filter females 20-39 in RHQ merged dataset who answered RHQ360
+females_20_39_answered_RHQ360 <- females_20_54_with_RHQ360 %>%
+  filter(RIDAGEYR >= 20, RIDAGEYR <= 39, !is.na(RHQ360))
+
+# Step 2: Check how many are in the depression dataset
+females_20_39_in_depression <- females_20_39_answered_RHQ360 %>%
+  filter(SEQN %in% Depression_data_combined$SEQN)
+
+# Step 3: Calculate how many are missing from the depression dataset
+females_20_39_missing_depression <- nrow(females_20_39_answered_RHQ360) - nrow(females_20_39_in_depression)
+
+# Step 4: Output the results
+cat("Females aged 20-39 in RHQ merged dataset who answered RHQ360 and are in the Depression dataset:", nrow(females_20_39_in_depression), "\n")
+cat("Females aged 20-39 in RHQ merged dataset who answered RHQ360 and are missing from the Depression dataset:", females_20_39_missing_depression, "\n")
+
+
+##########
+
+# Step 1: Filter females 20-39 in the RHQ merged dataset who answered RHQ360
+females_20_39_answered_RHQ360 <- females_20_54_with_RHQ360 %>%
+  filter(RIDAGEYR >= 20, RIDAGEYR <= 39, !is.na(RHQ360))
+
+# Step 2: Check how many are in the GAD dataset
+females_20_39_in_GAD <- females_20_39_answered_RHQ360 %>%
+  filter(SEQN %in% GAD_data_combined$SEQN)
+
+# Step 3: Calculate how many are missing from the GAD dataset
+females_20_39_missing_GAD <- nrow(females_20_39_answered_RHQ360) - nrow(females_20_39_in_GAD)
+
+# Step 4: Output the results
+cat("Females aged 20-39 in RHQ merged dataset who answered RHQ360 and are in the GAD dataset:", nrow(females_20_39_in_GAD), "\n")
+cat("Females aged 20-39 in RHQ merged dataset who answered RHQ360 and are missing from the GAD dataset:", females_20_39_missing_GAD, "\n")
+
+######
+
+# Step 1: Filter females 20-39 in the RHQ merged dataset who answered RHQ360
+females_20_39_answered_RHQ360 <- females_20_54_with_RHQ360 %>%
+  filter(RIDAGEYR >= 20, RIDAGEYR <= 39, !is.na(RHQ360))
+
+# Step 2: Check how many are in both the GAD and Depression datasets
+females_20_39_in_both <- females_20_39_answered_RHQ360 %>%
+  filter(SEQN %in% GAD_data_combined$SEQN & SEQN %in% Depression_data_combined$SEQN)
+
+# Step 3: Calculate how many are missing from both datasets
+females_20_39_missing_both <- females_20_39_answered_RHQ360 %>%
+  filter(!(SEQN %in% GAD_data_combined$SEQN) & !(SEQN %in% Depression_data_combined$SEQN))
+
+# Step 4: Output the results
+cat("Females aged 20-39 in RHQ merged dataset who answered RHQ360 and are in BOTH GAD and Depression datasets:", nrow(females_20_39_in_both), "\n")
+cat("Females aged 20-39 in RHQ merged dataset who answered RHQ360 and are MISSING from BOTH GAD and Depression datasets:", nrow(females_20_39_missing_both), "\n")
+
+#####
+
+# Step 1: Merge the GAD and Depression data with the females_20_39_in_both_GAD_and_Depression dataset
+females_20_39_in_both_GAD_and_Depression_merged <- females_20_39_in_both_GAD_and_Depression %>%
+  left_join(GAD_data_combined %>% select(SEQN, CIDGSCOR), by = "SEQN") %>%
+  left_join(Depression_data_combined %>% select(SEQN, CIDDSCOR), by = "SEQN")
+
+# Step 2: Filter for those who answered both CIDGSCOR and CIDDSCOR
+females_answered_both <- females_20_39_in_both_GAD_and_Depression_merged %>%
+  filter(!is.na(CIDGSCOR) & !is.na(CIDDSCOR))
+
+# Step 3: Filter for those who are missing both CIDGSCOR and CIDDSCOR
+females_missing_both <- females_20_39_in_both_GAD_and_Depression_merged %>%
+  filter(is.na(CIDGSCOR) & is.na(CIDDSCOR))
+
+# Step 4: Output the results
+cat("Females aged 20-39 in RHQ merged dataset who answered RHQ360 and are in BOTH GAD and Depression datasets AND answered both CIDGSCOR and CIDDSCOR:", nrow(females_answered_both), "\n")
+cat("Females aged 20-39 in RHQ merged dataset who answered RHQ360 and are in BOTH GAD and Depression datasets AND are MISSING both CIDGSCOR and CIDDSCOR:", nrow(females_missing_both), "\n")
+
+####
+# Step 1: Filter for females 20-39 who answered RHQ360, are in both GAD and Depression datasets,
+# and have answered both CIDGSCOR and CIDDSCOR
+females_answered_both <- females_20_39_in_both_GAD_and_Depression_merged %>%
+  filter(!is.na(CIDGSCOR) & !is.na(CIDDSCOR))
+
+# Step 2: Identify positive and negative diagnoses for both CIDGSCOR and CIDDSCOR
+# Positive diagnosis is coded as 1, and negative diagnosis is coded as 5 for both variables
+
+# Count of positive diagnoses for both CIDGSCOR and CIDDSCOR (both CIDGSCOR == 1 and CIDDSCOR == 1)
+positive_both <- females_answered_both %>%
+  filter(CIDGSCOR == 1 & CIDDSCOR == 1)
+
+# Count of negative diagnoses for both CIDGSCOR and CIDDSCOR (both CIDGSCOR == 5 and CIDDSCOR == 5)
+negative_both <- females_answered_both %>%
+  filter(CIDGSCOR == 5 & CIDDSCOR == 5)
+
+# Output the results
+cat("Females aged 20-39 who answered RHQ360, are present in both GAD and Depression datasets, have answered both CIDGSCOR and CIDDSCOR, and have a positive diagnosis for both:", nrow(positive_both), "\n")
+cat("Females aged 20-39 who answered RHQ360, are present in both GAD and Depression datasets, have answered both CIDGSCOR and CIDDSCOR, and have a negative diagnosis for both:", nrow(negative_both), "\n")
+
+#########
+
+# Step 1: Filter for females 20-39 who answered RHQ360, are in both GAD and Depression datasets,
+# and have answered both CIDGSCOR and CIDDSCOR
+females_answered_both <- females_20_39_in_both_GAD_and_Depression_merged %>%
+  filter(!is.na(CIDGSCOR) & !is.na(CIDDSCOR))
+
+# Step 2: Identify females who have one positive diagnosis and one negative diagnosis
+# Positive for CIDGSCOR and negative for CIDDSCOR
+positive_CIDGSCOR_negative_CIDDSCOR <- females_answered_both %>%
+  filter(CIDGSCOR == 1 & CIDDSCOR == 5)
+
+# Negative for CIDGSCOR and positive for CIDDSCOR
+negative_CIDGSCOR_positive_CIDDSCOR <- females_answered_both %>%
+  filter(CIDGSCOR == 5 & CIDDSCOR == 1)
+
+# Step 3: Count the number of females in each group
+cat("Females aged 20-39 who answered RHQ360, are present in both GAD and Depression datasets, have answered both CIDGSCOR and CIDDSCOR, and have a positive diagnosis for CIDGSCOR and a negative diagnosis for CIDDSCOR:", nrow(positive_CIDGSCOR_negative_CIDDSCOR), "\n")
+cat("Females aged 20-39 who answered RHQ360, are present in both GAD and Depression datasets, have answered both CIDGSCOR and CIDDSCOR, and have a negative diagnosis for CIDGSCOR and a positive diagnosis for CIDDSCOR:", nrow(negative_CIDGSCOR_positive_CIDDSCOR), "\n")
+
+#####
+
+# Step 1: Filter for females 20-39 who answered RHQ360 and are in both GAD and Depression datasets
+females_answered_both <- females_20_39_in_both_GAD_and_Depression_merged %>%
+  filter(!is.na(RHQ360))
+
+# Step 2: Identify those who answered both CIDGSCOR and CIDDSCOR (both valid)
+answered_both <- females_answered_both %>%
+  filter(!is.na(CIDGSCOR) & !is.na(CIDDSCOR))
+
+# Step 3: Identify those who are missing both CIDGSCOR and CIDDSCOR
+missing_both <- females_answered_both %>%
+  filter(is.na(CIDGSCOR) & is.na(CIDDSCOR))
+
+# Step 4: Identify those who answered only one of the two
+answered_one_only <- females_answered_both %>%
+  filter((!is.na(CIDGSCOR) & is.na(CIDDSCOR)) | (is.na(CIDGSCOR) & !is.na(CIDDSCOR)))
+
+# Step 5: Count the number of females in each group
+cat("Females aged 20-39 who answered RHQ360 and are present in both GAD and Depression datasets who answered both CIDGSCOR and CIDDSCOR:", nrow(answered_both), "\n")
+cat("Females aged 20-39 who answered RHQ360 and are present in both GAD and Depression datasets who are missing both CIDGSCOR and CIDDSCOR:", nrow(missing_both), "\n")
+cat("Females aged 20-39 who answered RHQ360 and are present in both GAD and Depression datasets who answered only one of CIDGSCOR or CIDDSCOR:", nrow(answered_one_only), "\n")
+
+####
+
+# Step 1: Filter for females 20-39 who answered RHQ360 and are in both GAD and Depression datasets
+females_answered_both <- females_20_39_in_both_GAD_and_Depression_merged %>%
+  filter(!is.na(RHQ360))
+
+# Step 2: Identify those who answered only CIDGSCOR (and not CIDDSCOR)
+answered_only_CIDGSCOR <- females_answered_both %>%
+  filter(!is.na(CIDGSCOR) & is.na(CIDDSCOR))
+
+# Step 3: Identify those who answered only CIDDSCOR (and not CIDGSCOR)
+answered_only_CIDDSCOR <- females_answered_both %>%
+  filter(is.na(CIDGSCOR) & !is.na(CIDDSCOR))
+
+# Step 4: Count the number of females in each group
+cat("Females 20-39 who answered RHQ360 and are in both GAD and Depression datasets who answered only CIDGSCOR:", nrow(answered_only_CIDGSCOR), "\n")
+cat("Females 20-39 who answered RHQ360 and are in both GAD and Depression datasets who answered only CIDDSCOR:", nrow(answered_only_CIDDSCOR), "\n")
+
+####
+
+
+# Step 1: Filter for females 20-39 who answered RHQ360 and are in the merged Depression dataset
+females_answered_RHQ_and_in_Depression <- females_20_39_in_RHQ %>%
+  filter(SEQN %in% Depression_data_combined$SEQN)
+
+# Step 2: Count those who answered CIDDSCOR
+answered_CIDDSCOR <- females_answered_RHQ_and_in_Depression %>%
+  filter(!is.na(CIDDSCOR))
+
+# Step 3: Count those who are missing CIDDSCOR
+missing_CIDDSCOR <- females_answered_RHQ_and_in_Depression %>%
+  filter(is.na(CIDDSCOR))
+
+# Step 4: Display the counts
+cat("Females 20-39 who answered RHQ360 and are in the merged Depression dataset who answered CIDDSCOR:", nrow(answered_CIDDSCOR), "\n")
+cat("Females 20-39 who answered RHQ360 and are in the merged Depression dataset who are missing CIDDSCOR:", nrow(missing_CIDDSCOR), "\n")
+
+
+
