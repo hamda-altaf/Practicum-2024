@@ -52,6 +52,45 @@ table(final_data$CIDGSCOR, final_data$RHQ360)
 #proportions of yes, no, don't know by +ve, -ve diagnosis
 prop.table(table(final_data$CIDGSCOR, final_data$RHQ360)) * 100
 
+# Calculate proportions
+prop_data <- prop.table(table(final_data$CIDGSCOR, final_data$RHQ360)) * 100
+
+# Convert the table to a data frame for ggplot
+prop_data_df <- as.data.frame(prop_data)
+colnames(prop_data_df) <- c("CIDGSCOR", "RHQ360", "Proportion")
+
+# Map values for clarity
+prop_data_df$CIDGSCOR <- factor(prop_data_df$CIDGSCOR, 
+                                levels = c(1, 5), 
+                                labels = c("Yes", "Don't Know"))
+prop_data_df$RHQ360 <- factor(prop_data_df$RHQ360, 
+                              levels = c(1, 2), 
+                              labels = c("Positive Diagnosis", "Negative Diagnosis"))
+
+# Create the stacked bar plot
+ggplot(prop_data_df, aes(x = RHQ360, y = Proportion, fill = CIDGSCOR)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(
+    title = "Proportions of GAD Responses by Diagnosis",
+    x = "Diagnosis (RHQ360)",
+    y = "Proportion (%)",
+    fill = "GAD Responses"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("Yes" = "#1f78b4", "Don't Know" = "#33a02c"))  # Adjust colors if needed
+
+# Optional: Create a grouped bar plot instead
+ggplot(prop_data_df, aes(x = RHQ360, y = Proportion, fill = CIDGSCOR)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
+  labs(
+    title = "Proportions of GAD Responses by Diagnosis",
+    x = "Diagnosis (RHQ360)",
+    y = "Proportion (%)",
+    fill = "GAD Responses"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("Yes" = "#1f78b4", "Don't Know" = "#33a02c"))  # Adjust colors if needed
+
 
 #######
 
@@ -117,6 +156,35 @@ categorical_summary <- female_data %>%
 print("Categorical Summary:")
 print(categorical_summary)
 
+# Frequency counts and percentages for categorical variables
+categorical_summary <- female_data %>%
+  summarise(
+    Total_Females = n(),
+    GAD_Positive_Count = sum(GAD_status == "Positive Diagnosis", na.rm = TRUE),
+    GAD_Negative_Count = sum(GAD_status == "Negative Diagnosis", na.rm = TRUE),
+    DD_Positive_Count = sum(DD_status == "Positive Diagnosis", na.rm = TRUE),
+    DD_Negative_Count = sum(DD_status == "Negative Diagnosis", na.rm = TRUE), # Added DD Negative count
+    Endometriosis_Yes_Count = sum(Endometriosis_status == "Yes", na.rm = TRUE),
+    Endometriosis_No_Count = sum(Endometriosis_status == "No", na.rm = TRUE),
+    Endometriosis_Refused_Count = sum(Endometriosis_status == "Refused", na.rm = TRUE),
+    Endometriosis_Dont_Know_Count = sum(Endometriosis_status == "Don't know", na.rm = TRUE)
+  ) %>%
+  mutate(
+    GAD_Positive_Percent = GAD_Positive_Count / Total_Females * 100,
+    GAD_Negative_Percent = GAD_Negative_Count / Total_Females * 100,
+    DD_Positive_Percent = DD_Positive_Count / Total_Females * 100,
+    DD_Negative_Percent = DD_Negative_Count / Total_Females * 100, # Added DD Negative percentage
+    Endometriosis_Yes_Percent = Endometriosis_Yes_Count / Total_Females * 100,
+    Endometriosis_No_Percent = Endometriosis_No_Count / Total_Females * 100,
+    Endometriosis_Refused_Percent = Endometriosis_Refused_Count / Total_Females * 100,
+    Endometriosis_Dont_Know_Percent = Endometriosis_Dont_Know_Count / Total_Females * 100
+  )
+
+# Display categorical variable summary
+print("Categorical Summary:")
+print(categorical_summary)
+
+
 # Means and standard deviations for continuous variables (age)
 continuous_summary <- female_data %>%
   summarise(
@@ -144,7 +212,7 @@ gad_plot <- female_data %>%
   theme_minimal(base_size = 11) +
   theme(
     legend.position = "none",
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 8), # Even smaller title
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 15), # Even smaller title
     axis.text.x = element_text(angle = 30, hjust = 1) # Rotate x-axis labels
   ) +
   scale_fill_brewer(palette = "Set2")
@@ -161,7 +229,7 @@ dd_plot <- female_data %>%
   theme_minimal(base_size = 11) +
   theme(
     legend.position = "none",
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 8), # Even smaller title
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 15), # Even smaller title
     axis.text.x = element_text(angle = 30, hjust = 1) # Rotate x-axis labels
   ) +
   scale_fill_brewer(palette = "Set2")
@@ -179,7 +247,7 @@ endo_plot <- female_data %>%
   theme_minimal(base_size = 11) +
   theme(
     legend.position = "none",
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 8), # Even smaller title
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 14), # Even smaller title
     axis.text.x = element_text(angle = 30, hjust = 1) # Rotate x-axis labels
   ) +
   scale_fill_brewer(palette = "Set2")
@@ -194,7 +262,7 @@ age_plot <- female_data %>%
   ) +
   theme_minimal(base_size = 11) +
   theme(
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 7) # Even smaller title
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 14) # Even smaller title
   )
 
 # Combine the plots using patchwork
@@ -220,6 +288,35 @@ combined_plot <- combined_plot +
 
 # Display the combined plot
 print(combined_plot)
+
+# New plot: Prevalence of GAD and DD by Endometriosis Status
+gad_dd_by_endo_plot <- female_data %>%
+  count(Endometriosis_status, GAD_status, DD_status) %>%
+  filter(Endometriosis_status %in% c("Yes", "No")) %>%
+  ggplot(aes(x = Endometriosis_status, y = n, fill = interaction(GAD_status, DD_status))) +
+  geom_bar(stat = "identity", position = "dodge", color = "black") +
+  labs(
+    title = "Prevalence of GAD & DD by Endometriosis Status",
+    x = "Endometriosis Status",
+    y = "Count",
+    fill = "GAD x DD"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 9), # Smaller plot title
+    axis.text.x = element_text(size = 12),                           # X-axis text size
+    axis.title.x = element_text(size = 14),                          # X-axis label size
+    axis.title.y = element_text(size = 14),                          # Y-axis label size
+    legend.position = "right",                                       # Move legend to the side
+    legend.text = element_text(size = 8),                            # Smaller legend text
+    legend.title = element_text(size = 9),                           # Smaller legend title
+    legend.key.size = unit(0.4, "cm"),                               # Smaller legend keys
+    legend.spacing.x = unit(0.2, "cm"),                              # Reduce spacing between legend items
+    legend.margin = margin(t = 0, b = 0, unit = "cm")                # Minimize legend margins
+  ) +
+  scale_fill_brewer(palette = "Set2")
+
+
 
 ###
 
@@ -354,4 +451,88 @@ final_data %>%
 #GAD-negative individuals (CIDGSCOR = 5) show a 3.4% prevalence of endometriosis.
 #Prevalence in age group 30-39: GAD-positive individuals (CIDGSCOR = 1) have a 12.5% prevalence of endometriosis.
 #GAD-negative individuals (CIDGSCOR = 5) have an 8.15% prevalence of endometriosis.
+
+###table 1
+# Install the Hmisc package if you haven't already
+install.packages("Hmisc")
+
+# Load the necessary libraries
+library(tidyverse)
+library(arsenal)
+library(haven)
+library(Hmisc)  # Required for label()
+
+# Recode categorical variables for readability
+final_data$GAD_status <- factor(final_data$GAD_status, levels = c("Positive Diagnosis", "Negative Diagnosis"), labels = c("Positive", "Negative"))
+final_data$DD_status <- factor(final_data$DD_status, levels = c("Positive Diagnosis", "Negative Diagnosis"), labels = c("Positive", "Negative"))
+final_data$Endometriosis_status <- factor(final_data$Endometriosis_status, levels = c("Yes", "No", "Refused", "Don't know"))
+final_data$Gender <- factor(final_data$Gender, levels = c("Female", "Male"), labels = c("Female", "Male"))
+
+# Label the variables
+label(final_data$Gender) <- "Gender"
+label(final_data$RIDAGEYR) <- "Age"
+label(final_data$GAD_status) <- "GAD Status"
+label(final_data$DD_status) <- "Depression Diagnosis"
+label(final_data$Endometriosis_status) <- "Endometriosis Status"
+
+# Units for continuous variables (e.g., age)
+units(final_data$RIDAGEYR) <- "Years"
+
+# Filter for female data, and create age groups
+female_data <- final_data %>%
+  filter(Gender == "Female", RIDAGEYR >= 20 & RIDAGEYR <= 39)
+
+# Generate Table 1 with characteristics by GAD status
+table1( ~ RIDAGEYR + Gender + GAD_status + DD_status + Endometriosis_status | GAD_status,
+        data = female_data,
+        caption = "Table 1: Baseline Characteristics by GAD Status",
+        render.continuous = c("Mean [SD]", "Median [Min, Max]"),  # Use appropriate summary statistics
+        overall = c(left = "Total"))
+####table 1 second try###
+# Install and load necessary libraries
+install.packages("tableone")
+library(tidyverse)
+library(tableone)
+
+# Recode categorical variables for readability
+final_data$GAD_status <- factor(final_data$GAD_status, levels = c("Positive Diagnosis", "Negative Diagnosis"), labels = c("Positive", "Negative"))
+final_data$DD_status <- factor(final_data$DD_status, levels = c("Positive Diagnosis", "Negative Diagnosis"), labels = c("Positive", "Negative"))
+final_data$Endometriosis_status <- factor(final_data$Endometriosis_status, levels = c("Yes", "No", "Refused", "Don't know"))
+final_data$Gender <- factor(final_data$Gender, levels = c("Female", "Male"), labels = c("Female", "Male"))
+
+# Filter for female data
+female_data <- final_data %>%
+  filter(Gender == "Female", RIDAGEYR >= 20 & RIDAGEYR <= 39)
+
+# Create a table with baseline characteristics by GAD status
+table1 <- CreateTableOne(vars = c("RIDAGEYR", "Gender", "GAD_status", "DD_status", "Endometriosis_status"), 
+                         strata = "GAD_status", 
+                         data = female_data, 
+                         factorVars = c("Gender", "GAD_status", "DD_status", "Endometriosis_status"))
+
+# Print the table
+print(table1)
+
+###table 1 try 3###
+# Remove rows where GAD_status has missing values
+female_data <- female_data %>%
+  filter(!is.na(GAD_status))  # Remove rows with NA in GAD_status
+
+# Alternatively, remove rows with any missing values (if needed for other variables too)
+# female_data <- female_data %>%
+#   filter(complete.cases(female_data))  # Remove rows with any missing values
+
+# Generate Table 1 with characteristics by GAD status
+library(table1)
+table1_result <- table1( ~ RIDAGEYR + Gender + GAD_status + DD_status + Endometriosis_status | GAD_status,
+                         data = female_data,
+                         caption = "Table 1: Baseline Characteristics by GAD Status",
+                         render.continuous = c("Mean [SD]", "Median [Min, Max]"),
+                         overall = c(left = "Total"))
+
+# Print the table
+print(table1_result)
+
+
+
 
