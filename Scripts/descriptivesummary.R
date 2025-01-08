@@ -333,21 +333,7 @@ print(odds_gad)
 
 # Calculate the odds ratio for DD vs Endometriosis status
 odds_dd <- oddsratio(dd_vs_endo)
-print(odds_dd) #did not calculate properly due to low counts for don't know
-
-#manually calculate odds ratio for DD vs Endometriosis status
-# Define the counts from the table
-a <- 1  # DD Negative, Endometriosis: Don't know
-b <- 1083  # DD Negative, Endometriosis: No
-c <- 86  # DD Positive, Endometriosis: No
-d <- 7  # DD Positive, Endometriosis: Yes
-
-# Calculate the odds ratio
-odds_ratio <- (a * d) / (b * c)
-
-# Print the odds ratio
-print(odds_ratio) #calculated odds ratio is very small, which suggests that the odds of having endometriosis are extremely low in the group of women with a positive diagnosis of depressive disorder (DD) compared to those without DD
-#fisher's exact test? 
+print(odds_dd) 
 
 #If the odds ratio is greater than 1, it suggests that the presence of endometriosis is associated with a higher odds of having GAD or DD.
 #If the odds ratio is less than 1, it suggests that the presence of endometriosis is associated with a lower odds of having GAD or DD.
