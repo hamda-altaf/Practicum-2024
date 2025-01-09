@@ -4,8 +4,6 @@ library(flextable)
 # Shapiro-Wilk test for normality for age
 shapiro.test(final_data$RIDAGEYR)
 
-library(dplyr)
-library(flextable)
 
 # Function to create a summary table
 create_summary_table <- function(data, variables, var_names = NULL, level_names = NULL) {
@@ -145,9 +143,11 @@ formatted_summary_table <- summary_table %>%
   add_header_lines("Table of Baseline Characteristics") %>%
   add_footer_lines(c(
     "Continuous variables are presented as median [IQR] or mean (SD), depending on normality.",
-    "Categorical variables are presented as counts (percentages)."
+    "Categorical variables are presented as counts (percentages).", 
+    "GAD, Generalized Anxiety Disorder. DD, Depressive Disorders."
   )) %>%
   fontsize(part = "footer", size = 8) %>%  # Reduce font size for footnotes
+  padding(padding.top = 2, padding.bottom = 2, part = "footer") %>%  # Adjust padding
   autofit() %>%
   bold(part = "header") %>%
   bold(j = "Variable", part = "all") %>%  

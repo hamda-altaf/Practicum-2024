@@ -398,7 +398,7 @@ chisq.test(table(final_data$CIDGSCOR, final_data$RHQ360))
 ###
 
 #T-test to compare the age distribution between two groups based on Generalized Anxiety Disorder (GAD) status
-t.test(RIDAGEYR ~ CIDGSCOR, data = final_data)
+t.test(RIDAGEYR ~ CIDDSCOR, data = final_data)
 #indicates that there is a statistically significant difference in the mean age between the two groups, GAD positive vs. GAD negative
 
 ###
