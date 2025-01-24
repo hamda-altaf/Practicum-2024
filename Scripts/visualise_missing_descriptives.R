@@ -4,7 +4,7 @@ library(ggplot2)
 library(Amelia)
 library(psych)  # For descriptive statistics
 
-# Assuming `raw_data` is your dataset with the variables:
+# Assuming `raw_data` is the dataset with the variables:
 # RHQ360, CIDDSCOR (depression score), CIDGSCOR (GAD score), RIDAGEYR (age), and RIDRETH1 (race)
 
 # 1. View the first few rows of the dataset

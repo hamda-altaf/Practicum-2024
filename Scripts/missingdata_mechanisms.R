@@ -156,17 +156,18 @@ library(finalfit)
 library(knitr)
 library(kableExtra)
 
+#how explanatory variables differ between rows where RHQ360 is missing vs. not missing for MAR and MNAR data
 mar_data %>% 
   finalfit::missing_compare(dependent = "RHQ360",  # Outcome variable (RHQ360)
                             explanatory = c("RIDAGEYR", "RIDRETH1", "CIDGSCOR", "CIDDSCOR", "DMDMARTL")) %>% 
   knitr::kable(row.names = FALSE, align = c("l", "l", "r", "r", "r", "r"),
-               caption = "Comparison by RHQ360 missing vs not missing using MCAR data") %>% 
+               caption = "Comparison by RHQ360 missing vs not missing using MAR data") %>% 
   kable_styling(full_width = F)
 
 mnar_data %>% 
   finalfit::missing_compare(dependent = "RHQ360",  # Outcome variable (RHQ360)
                             explanatory = c("RIDAGEYR", "RIDRETH1", "CIDGSCOR", "CIDDSCOR", "DMDMARTL")) %>% 
   knitr::kable(row.names = FALSE, align = c("l", "l", "r", "r", "r", "r"),
-               caption = "Comparison by RHQ360 missing vs not missing using MCAR data") %>% 
+               caption = "Comparison by RHQ360 missing vs not missing using MNAR data") %>% 
   kable_styling(full_width = F)
 
