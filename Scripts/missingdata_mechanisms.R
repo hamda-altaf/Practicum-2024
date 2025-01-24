@@ -4,6 +4,7 @@ library(dplyr)
 library(Amelia)  # For visualizing missingness
 
 # Assuming `raw_data` is your original dataset
+#simulating missing data under three common missingness mechanisms
 
 # Set the missing rate
 missing_rate_mcar <- 0.2  # 20% missing at random
