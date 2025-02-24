@@ -18,7 +18,7 @@ selected_vars <- c("SEQN", "RIAGENDR", "RIDAGEYR", "RIDRETH1", "DMDMARTL", "DMDE
                    "INDFMPIR", "WTMEC2YR", "SDMVPSU", "SDMVSTRA")
 demo <- demo %>% select(all_of(selected_vars))
 
-rhq <- rhq %>% select(SEQN, RHQ010, RHQ360)
+rhq <- rhq %>% select(SEQN, RHQ010, RHQ131, RHQ360)
 dpq <- dpq %>% select(SEQN, DPQ010:DPQ090)
 bmx <- bmx %>% select(SEQN, BMXBMI)
 
